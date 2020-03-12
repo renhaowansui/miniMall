@@ -14,12 +14,14 @@ export default {
   #tabbar{
     height: 49px;
     padding-top: 4px;
-    box-shadow: 0 -2px 0 rgba(0, 0, 0, .3);
+    box-shadow: 0 -1px 0 rgba(0, 0, 0, .1);
     position: fixed;
     left: 0;
     right: 0;
     bottom: 0;
     display: flex;
-    text-align: center
+    text-align: center;
+    background: #fff;
+    z-index: 999;
   }
 </style>

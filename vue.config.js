@@ -11,5 +11,10 @@ module.exports = {
         'views': '@/views'
       }
     }
+  },
+  devServer: {
+    public: '192.168.43.59:8080',
+    hot: true,
+    disableHostCheck: true,
   }
 }
