@@ -17,23 +17,27 @@ const routes = [
     redirect: '/home'
   },
   {
-    path: '/home',
     name: 'Home',
+    path: '/home',
     component: Home
   },
   {
+    name: 'Detail',
     path: '/detail',
     component: Detail
   },
   {
+    name: 'Category',
     path: '/category',
     component: Category
   },
   {
+    name: 'cart',
     path: '/cart',
     component: Cart
   },
   {
+    name: 'Profile',
     path: '/profile',
     component: Profile
   }

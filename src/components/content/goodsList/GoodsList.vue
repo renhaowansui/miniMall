@@ -25,6 +25,7 @@ export default {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-around;
+    margin-top: 5px;
     padding: 4px;
     font-size: 12px;
     text-align: center;

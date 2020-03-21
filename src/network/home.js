@@ -1,12 +1,12 @@
-import {HomeInstance} from './axios';
+import {Instance} from './axios';
 
 // 请求首页数据方法
 export function getHomeMultData(){
-  return HomeInstance({url :'/home/multidata'})
+  return Instance({url :'/home/multidata'})
 }
 // 请求首页商品数据方法
 export function getHomeGoods(type, page){
-  return HomeInstance({
+  return Instance({
     url :'/home/data',
     params: {
       type,

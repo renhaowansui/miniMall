@@ -45,12 +45,19 @@ export default {
     })
   },
   methods: {
+    getScrollPosY(){
+      return  this.scroll.y
+    },
     scrollTo(x, y, time=300){
-      this.scroll.scrollTo(x,y, time)
+      this.scroll && this.scroll.scrollTo(x,y, time)
     },
     finishPullUp(){
-      // 上拉回调完成，则可再次上拉回调，不然只能执行一次上拉
-      this.scroll.finishPullUp()
+      // 上拉回调完成，则可再次上拉回调，不然只能执行一次上拉     
+      this.scroll && this.scroll.finishPullUp()
+    },
+    scrollRefresh(){
+      console.log("scrollRefresh");
+      this.scroll && this.scroll.refresh()
     }
   }
 }

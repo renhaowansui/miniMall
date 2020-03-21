@@ -95,6 +95,8 @@ export default {
       this.isScrolling = false
     },
     ScrollStart(){
+      console.log("开始了");
+      
       window.timer = window.setInterval(() => {
         this.currentIndex++
         this.ScrollComplete(-this.currentIndex * this.slideWidth)

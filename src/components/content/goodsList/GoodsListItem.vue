@@ -1,10 +1,8 @@
 <template>
-  <div id="goods-List-item">
-    <a :href="good.link">
-      <img :src="good.show.img" alt="">
-    </a>
+  <div id="goods-List-item" @click="goodsClick">
+    <img v-lazy="showImages" alt="" @load="goodImgLoad">
     <div class="itemInfo">
-      <p class="ellipsis">{{good.props[0]}}</p>
+      <p class="ellipsis">{{good.title}}</p>
       <span class="price">{{good.price}}</span>
       <span class="cfav">{{good.cfav}}</span>
     </div>
@@ -18,7 +16,28 @@ export default {
       type: Object,
       default: {}
     }
-  }
+  },
+  computed: {
+    showImages(){
+      return this.good.image || this.good.show.img
+    }
+  },
+  methods: {
+    goodImgLoad(){
+      this.$bus.$emit('goodImgLoad')
+    },
+    goodsClick(){
+      // 通过动态路由更换地址路径
+      // this.$router.push('detail', this.good.iid)
+      // 通过query更换地址路径  
+      this.$router.push({
+        path: 'detail',
+        query: {
+          iid: this.good.item_id || this.good.iid
+        }
+      })
+    }
+  },
 }
 </script>
 

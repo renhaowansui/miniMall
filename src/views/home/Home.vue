@@ -3,20 +3,25 @@
     <nav-bar class="homeNavbar">
       <p slot="navbar-center">购物街</p>
     </nav-bar>
+    <tab-control ref="tabControlEl2" class="HomeTabControl" 
+                   :titles="['新品', '流行', '热卖']" 
+                   @tabControlClick="tabControlClick"
+                   v-show="isTabControlTop" />
     <scroll class="content" ref="scroll" 
             :isProbeType='3' :isClick='true'
-            :isPullUpload = 'true' 
             @getScrollPos='getScrollPos'
+            :isPullUpload = 'true' 
             @pullingUp='loadMoreGoods'>
-      <main-swiper class="HomeSwiper" :banners="banners" />
+      <main-swiper class="HomeSwiper" :banners="banners" 
+                   @swiperImgLoad='getTabControlPosY' />
       <recommend :recommends="recommends" />
       <feature />
-      <tab-control class="HomeTabControl" 
+      <tab-control ref="tabControlEl1" class="HomeTabControl" 
                    :titles="['新品', '流行', '热卖']" 
                    @tabControlClick="tabControlClick" />
       <goods-list :goods="getGoodType" />
     </scroll>
-    <back-top @click.native="BackTopClick" v-show="isShwoBackTop" />
+    <back-top @click.native="BackTopClick" v-show="isShowBackTop" />
   </div>
 </template>
 
@@ -26,7 +31,6 @@ import NavBar from 'components/common/navbar/NavBar';
 import tabControl from 'components/content/tabControl/tabControl';
 import GoodsList from 'components/content/goodsList/GoodsList';
 import Scroll from 'components/common/scroll/Scroll'
-import BackTop from 'components/content/backTop/BackTop'
 
 import MainSwiper from './childComponents/MainSwiper';
 import Recommend from './childComponents/Recommend';
@@ -34,6 +38,8 @@ import Feature from './childComponents/Feature'
 
 // 加载封装请求文件     
 import {getHomeMultData, getHomeGoods} from 'network/home.js';
+// 加载公用方法
+import {imgLoadListener, backTop} from '@/common/mixins.js';
 
 export default {
   name: 'Home',
@@ -45,7 +51,6 @@ export default {
     tabControl,
     GoodsList,
     Scroll,
-    BackTop
   },
   data(){
     return {
@@ -57,19 +62,34 @@ export default {
         'sell': {page: 1, list: []}
       },
       goodsType: 'new',
-      isShwoBackTop: false
+      count: 1,
+      tabControlPosY: 0,
+      isTabControlTop: false,
+      positionY: 0,
     }
   },
+  mixins: [imgLoadListener ,backTop],
   computed: {
     getGoodType(){
       return this.goods[this.goodsType].list
     }
   },
-  created(){
+  created() {
     this.getMultData()
     this.getGoodsData('new')
     this.getGoodsData('pop')
     this.getGoodsData('sell')
+  },
+  //  使用keep-alive缓存才能使用activated函数
+  activated() {
+    this.$refs.scroll.scrollRefresh()
+    this.$refs.scroll.scrollTo(0, this.positionY, 0)
+  },
+  deactivated() {
+    // 切换其他组件记录这个页面位置
+    this.positionY = this.$refs.scroll.getScrollPosY()
+    // 取消这个组件图片加载监听
+    this.$bus.$off('goodImgLoad', this.imgLoadListener)
   },
   methods: {
     /*
@@ -79,6 +99,8 @@ export default {
     getMultData(){
       getHomeMultData().then(res => {
         this.banners = res.data.banner.list;
+        console.log("加载了");
+        
         this.dKeywords = res.data.dKeyword.list;
         this.keywords = res.data.keywords.list;
         this.recommends = res.data.recommend.list;
@@ -107,19 +129,24 @@ export default {
           this.goodsType = 'sell'
           break;
       }
-    },
-    //  点击返回顶部按钮
-    BackTopClick(){
-      this.$refs.scroll.scrollTo(0, 0, 500);
+      this.$refs.tabControlEl1.currentIndex = index
+      this.$refs.tabControlEl2.currentIndex = index
     },
     //  获取滚动位置业务操作
     getScrollPos(position){
-      this.isShwoBackTop = -position.y > 1000
+      //  判断返回顶部按钮显示属性
+      this.judgeIsShowBackTop(position)
+      //  判断tabControl是否吸顶显示属性
+      this.isTabControlTop = -position.y > this.tabControlPosY
     },
     //  获取更多商品信息
     loadMoreGoods(){
       this.getGoodsData(this.goodsType)
-      this.$refs.scroll.finishPullUp
+      this.$refs.scroll.finishPullUp()
+    },
+    //  轮播图加载后执行函数获取TabControlPosY位置
+    getTabControlPosY(){
+      this.tabControlPosY = this.$refs.tabControlEl1.$el.offsetTop
     }
   }
 }
@@ -133,9 +160,9 @@ export default {
     color: #fff;
     background: var(--color-tint);
   }
-  .HomeSwiper{
-    /* margin-top: 44px; */
-  }
+  /* .HomeSwiper{
+    margin-top: 44px;
+  } */
   .HomeTabControl{
     position: sticky;
     top: 43px;
@@ -147,5 +174,11 @@ export default {
     top: 44px;
     bottom: 49px;
     overflow: hidden;
+  }
+  .fixed{
+    position: fixed;
+    top: 44px;
+    right: 0;
+    left: 0;
   }
 </style>
